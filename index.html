@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06060f">
+<title>STOP THE TIMER</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-state="menu">
+<div class="bg"></div><canvas id="fx" aria-hidden="true"></canvas>
+<main class="app">
+  <header>
+    <h1>STOP <i>THE</i> TIMER</h1>
+    <div class="stats">
+      <div><small>BEST</small><b id="stBest">—</b></div>
+      <div><small>POINTS</small><b id="stPts">0</b></div>
+      <div><small>STREAK</small><b id="stStreak">0</b></div>
+    </div>
+  </header>
+  <section class="stage" id="stage"><canvas id="c3d"></canvas></section>
+
+  <section id="menu" class="panel">
+    <div class="levels" role="group" aria-label="Level">
+      <button class="lvl" data-l="1" aria-pressed="false"><b>1</b><span>SECOND <kbd>1</kbd></span></button>
+      <button class="lvl" data-l="3" aria-pressed="true"><b>3</b><span>SECONDS <kbd>2</kbd></span></button>
+      <button class="lvl" data-l="5" aria-pressed="false"><b>5</b><span>SECONDS <kbd>3</kbd></span></button>
+    </div>
+    <p class="target">TARGET <b id="tgt">3.00</b> s</p>
+    <button id="start" class="main">START <kbd>SPACE</kbd></button>
+  </section>
+
+  <section id="play" class="panel">
+    <p class="hint">Feel the time…<br><span dir="rtl">اعتمد على إحساسك</span></p>
+    <button id="stop" class="main stop">STOP <kbd>SPACE</kbd></button>
+  </section>
+
+  <section id="result" class="panel">
+    <div class="count"><b id="rActual">0.00</b><span>s</span></div>
+    <div class="after">
+      <div class="grade" id="rGrade">PERFECT</div>
+      <div class="res">
+        <div><small>TARGET</small><b id="rTarget">3.00s</b></div>
+        <div><small id="rDir">EARLY BY</small><b id="rDiff">0 ms</b></div>
+        <div><small>POINTS</small><b id="rPts">+0</b></div>
+      </div>
+      <p class="new" id="rNew"></p>
+      <button id="again" class="main">TRY AGAIN</button>
+      <button id="change" class="ghost">MENU <kbd>SPACE</kbd></button>
+    </div>
+  </section>
+
+  <footer>
+    <span>Rounds <b id="fRounds">0</b></span><span>Perfects <b id="fPerf">0</b></span><span>Best streak <b id="fBS">0</b></span>
+    <button id="snd" class="chip" aria-pressed="true">SOUND ON</button><button id="reset" class="chip">RESET</button>
+  </footer>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
