@@ -41,7 +41,7 @@ function build() {
   x.drawImage(img, 0, 222, W, 374, 0, 222, W, 374); x.clearRect(0, 315, 70, 281); x.clearRect(244, 315, W - 244, 281);
   x.globalCompositeOperation = 'destination-in'; const fg = x.createLinearGradient(0, 576, 0, 596); fg.addColorStop(0, '#000'); fg.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = fg; x.fillRect(0, 0, W, 596); x.globalCompositeOperation = 'source-over';
   [0, 1].forEach(i => {
-    const c = mk(W, 660); x = c.getContext('2d'), x0 = i ? 232 : 0;
+    const c = mk(W, 660), x0 = i ? 232 : 0; x = c.getContext('2d');
     x.drawImage(img, x0, 295, i ? W - 232 : 84, 365, x0, 295, i ? W - 232 : 84, 365); x.clearRect(i ? 232 : 60, 590, i ? 31 : 24, 70);
     if (i) mask(c, 232, 0, 246, 0, true); else { const t = c.getContext('2d'), gr = t.createLinearGradient(70, 0, 84, 0); gr.addColorStop(0, '#000'); gr.addColorStop(1, 'rgba(0,0,0,0)'); t.globalCompositeOperation = 'destination-in'; t.fillStyle = gr; t.fillRect(0, 0, W, 660); t.globalCompositeOperation = 'source-over'; }
     mask(c, 0, 295, 0, 315); armC[i] = c;
