@@ -1,0 +1,125 @@
+name: Android build
+
+on:
+  push:
+    branches: [android-app]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      APP_ID: io.github.waseem391.stopthetimer
+      REQUIRED_TARGET_SDK: "36"          # Google Play: new apps/updates must target API 36 (checked below)
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: 1.0.${{ github.run_number }}
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: android-kit
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-36 build-tools;36.0.0"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Tool versions
+        run: node -v && java -version && echo "ANDROID_HOME=$ANDROID_HOME"
+
+      - name: Prepare web assets + generate Android project
+        run: bash scripts/prepare-android.sh
+
+      - name: Unit tests
+        working-directory: android-kit/android
+        run: chmod +x gradlew && ./gradlew testDebugUnitTest --stacktrace --no-daemon
+
+      - name: Build debug APK, release APK and release AAB
+        working-directory: android-kit/android
+        run: ./gradlew assembleDebug assembleRelease bundleRelease --stacktrace --no-daemon
+
+      - name: Collect outputs
+        run: |
+          mkdir -p dist/debug dist/release
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/debug/stop-the-timer-debug.apk
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk dist/release/stop-the-timer-release-UNSIGNED.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab dist/release/stop-the-timer-release-UNSIGNED.aab
+          ls -l dist/debug dist/release
+
+      - name: Verify the APK/AAB really exist and are correct
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          for f in dist/debug/*.apk dist/release/*.apk dist/release/*.aab; do test -s "$f" || { echo "::error::missing or empty: $f"; exit 1; }; done
+          "$BT/aapt2" dump badging dist/debug/stop-the-timer-debug.apk > badging.txt
+          grep -E "^package|targetSdkVersion|sdkVersion|application-label:" badging.txt
+          grep -q "package: name='$APP_ID'" badging.txt            || { echo "::error::wrong package id"; exit 1; }
+          grep -q "versionCode='$VERSION_CODE'" badging.txt        || { echo "::error::versionCode not applied"; exit 1; }
+          grep -q "targetSdkVersion:'$REQUIRED_TARGET_SDK'" badging.txt || { echo "::error::targetSdkVersion is not $REQUIRED_TARGET_SDK"; exit 1; }
+          unzip -l dist/debug/stop-the-timer-debug.apk | grep -q "assets/public/index.html" || { echo "::error::game files not packaged"; exit 1; }
+          unzip -l dist/release/stop-the-timer-release-UNSIGNED.aab | grep -q "base/manifest/AndroidManifest.xml" || { echo "::error::AAB looks invalid"; exit 1; }
+          echo "APK and AAB verified."
+
+      - name: Sign release AAB + APK (only when signing secrets exist)
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'upload' }}
+        run: |
+          set -euo pipefail
+          KS="$RUNNER_TEMP/upload.jks"; echo "$KS_B64" | base64 -d > "$KS"
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          cd dist/release
+          cp stop-the-timer-release-UNSIGNED.aab stop-the-timer-release-SIGNED.aab
+          jarsigner -keystore "$KS" -storepass:env KS_PASS -keypass:env KS_PASS -sigalg SHA256withRSA -digestalg SHA-256 stop-the-timer-release-SIGNED.aab "$KEY_ALIAS"
+          jarsigner -verify stop-the-timer-release-SIGNED.aab | head -3
+          "$BT/zipalign" -p 4 stop-the-timer-release-UNSIGNED.apk aligned.apk
+          "$BT/apksigner" sign --ks "$KS" --ks-pass env:KS_PASS --key-pass env:KS_PASS --ks-key-alias "$KEY_ALIAS" --out stop-the-timer-release-SIGNED.apk aligned.apk
+          "$BT/apksigner" verify --print-certs stop-the-timer-release-SIGNED.apk | head -3
+          rm -f aligned.apk *.apk.idsig "$KS"
+          ls -l
+
+      - name: Upload debug APK (install this on your phone)
+        uses: actions/upload-artifact@v4
+        with:
+          name: stop-the-timer-debug-apk
+          path: android-kit/dist/debug/stop-the-timer-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload release bundle (AAB) and release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: stop-the-timer-release
+          path: android-kit/dist/release/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Gradle reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-reports
+          path: android-kit/android/app/build/reports/
+          if-no-files-found: ignore
