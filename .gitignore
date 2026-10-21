@@ -1,0 +1,8 @@
+node_modules/
+android-kit/www/
+android-kit/android/
+android-kit/dist/
+*.jks
+*.keystore
+keystore.properties
+*.base64.txt

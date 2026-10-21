@@ -1,0 +1,11 @@
+{
+  "appId": "io.github.waseem391.stopthetimer",
+  "appName": "Stop The Timer",
+  "webDir": "www",
+  "backgroundColor": "#06060f",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 1200, "launchAutoHide": true, "backgroundColor": "#06060f", "androidScaleType": "CENTER_CROP", "showSpinner": false },
+    "SystemBars": { "insetsHandling": "css", "style": "DARK" }
+  }
+}
