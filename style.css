@@ -38,7 +38,7 @@ body[data-state=reveal] .after{opacity:0;pointer-events:none;transform:translate
 .grade{font-size:clamp(30px,10vw,46px);font-weight:900;letter-spacing:.1em;margin:4px 0 10px}
 .res{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.res b{font-family:var(--mono);font-size:18px}
 .new{min-height:20px;margin-top:8px;color:var(--c);font-weight:700;letter-spacing:.14em;font-size:12px}
-.g-PERFECT{color:#ffd84d;text-shadow:0 0 24px #ffb800}.g-AMAZING{color:#7df3ff;text-shadow:0 0 20px var(--c)}.g-GREAT{color:#6df0a8}.g-CLOSE{color:#ffb86b}.g-MISS{color:#ff6b8a}
+.g-PERFECT{color:#ffd84d;text-shadow:0 0 24px #ffb800}.g-AMAZING{color:#7df3ff;text-shadow:0 0 20px var(--c)}.g-GREAT{color:#6df0a8}.g-GOOD{color:#b8f27d}.g-CLOSE{color:#ffb86b}.g-MISS{color:#ff6b8a}
 footer{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 14px;font-size:12px;color:var(--mut)}footer b{font-family:var(--mono);color:var(--tx)}
 @keyframes pop{from{transform:translateX(-50%) scale(.6);opacity:0}}@keyframes rise{from{transform:translateY(12px);opacity:0}}
 @keyframes throb{50%{filter:brightness(1.35)}}@keyframes fade{50%{opacity:.5}}
