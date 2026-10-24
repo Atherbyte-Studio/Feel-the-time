@@ -2,7 +2,8 @@ name: Android build
 
 on:
   push:
-    branches: [android-app]
+    branches: [main]
+    paths: ['index.html', 'script.js', 'style.css', 'character.webp', 'android-kit/**', '.github/workflows/android.yml']
   workflow_dispatch:
 
 permissions:
