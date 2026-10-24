@@ -1,17 +1,28 @@
-# Stop The Timer — Android build (branch `android-app`)
+# Stop The Timer
 
-The web game in the repo root is **unchanged** and still works on GitHub Pages. This branch only *adds*:
+A timing game: stop the clock at exactly 1, 3 or 5 seconds. Plain HTML, CSS and JavaScript, no build step.
 
-- `android-kit/` – Capacitor 8 wrapper (config, icons, splash, Android-only tweaks, build scripts)
-- `.github/workflows/android.yml` – cloud build (no Android Studio needed)
-- `.github/workflows/create-upload-key.yml` – one-time helper to create your Play signing key
+## What is where
+
+```
+index.html, style.css, script.js, character.webp   the web game (GitHub Pages serves these from the repo root)
+android-kit/                                       Android wrapper (Capacitor 8)
+  capacitor.config.json, package.json              app id, plugins
+  assets/                                          app icon and splash images
+  scripts/                                         build-www.sh (copies the web game), prepare-android.sh
+  www-extra/                                       Android-only CSS and the Back-button / lifecycle shim
+.github/workflows/android.yml                      cloud build of the APK and AAB (no Android Studio needed)
+.github/workflows/create-upload-key.yml            one-time helper to create your Play signing key
+```
+
+The web files are never changed by the Android build: `android-kit/scripts/build-www.sh` copies them and adds the Android extras only in the copy.
 
 App id: `io.github.waseem391.stopthetimer` (**permanent once published on Google Play** – change it in
 `android-kit/capacitor.config.json` and `.github/workflows/android.yml` *before* the first upload if you want another).
 Target SDK: **36** (Google Play requirement for new apps/updates since 2026-08-31). The workflow fails if the APK does not target 36.
 
 ## 1. Build the APK (no setup)
-1. Every push to `android-app` builds automatically. Or: **Actions → Android build → Run workflow** (branch `android-app`).
+1. Every push to `main` that changes the game or `android-kit/` builds automatically. Or: **Actions → Android build → Run workflow** (branch `main`).
 2. Open the finished run (green ✔). Scroll to **Artifacts**.
 3. Download **stop-the-timer-debug-apk** (a zip containing `stop-the-timer-debug.apk`).
 4. Red ✖? Open the failed step, copy the first error line and send it to Claude.
