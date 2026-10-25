@@ -2,3 +2,4 @@
 html,body{overscroll-behavior:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .app{padding-top:max(14px,env(safe-area-inset-top),var(--safe-area-inset-top,0px))!important;
      padding-bottom:max(14px,env(safe-area-inset-bottom),var(--safe-area-inset-bottom,0px))!important}
+.studio-link{display:none!important}

@@ -47,3 +47,4 @@ footer{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap
 .stage{min-height:clamp(320px,52svh,540px);cursor:pointer}
 @media(min-width:860px){.app{max-width:1000px;display:grid;grid-template-columns:1.1fr 1fr;grid-template-areas:"h h" "s p" "f f";column-gap:32px;align-items:center}
 header{grid-area:h}.stage{grid-area:s;min-height:68svh}.panel{grid-area:p}footer{grid-area:f}}
+.studio-link{color:var(--mut);text-decoration:none;font-weight:700;letter-spacing:.08em;padding:10px 6px}.studio-link:hover,.studio-link:focus-visible{color:var(--tx);text-decoration:underline}
