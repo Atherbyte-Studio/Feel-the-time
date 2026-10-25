@@ -1,6 +1,6 @@
 'use strict';
 /* ===== CONFIG: grading, in MILLISECONDS away from the target (inclusive) — edit here =====
-   PERFECT is the exact millisecond (the time shown on screen equals the target, e.g. 3.000). The big celebration is
+   PERFECT is the exact millisecond (the time shown on screen equals the target, e.g. 3.00). The big celebration is
    only for PERFECT, a smaller one for AMAZING and GREAT; GOOD is a polite smile; further away the rabbit gets sadder
    the further you were (see sadFor). */
 const GRADES = [
@@ -61,7 +61,7 @@ $('stage').addEventListener('pointerdown', () => {
 let state = 'menu', level = 3, t0 = 0, lockUntil = 0, rev = null;
 const setState = s => { state = s; document.body.dataset.state = s; if (document.activeElement) document.activeElement.blur(); musicSync(); };
 const say = () => {};
-const fmtBest = ms => ms == null ? '—' : '±' + (ms / 1000).toFixed(3) + 's';
+const fmtBest = ms => ms == null ? '—' : '±' + (ms / 1000).toFixed(2) + 's';
 function renderStats() {
   $('stBest').textContent = fmtBest(store.best[level]); $('stPts').textContent = store.points.toLocaleString(); $('stStreak').textContent = store.streak;
   $('fRounds').textContent = store.rounds; $('fPerf').textContent = store.perfects; $('fBS').textContent = store.bestStreak;
@@ -143,7 +143,7 @@ function loop() {
 function selectLevel(n, silent) {
   if (state !== 'menu') return;
   level = n; document.querySelectorAll('.lvl').forEach(b => b.setAttribute('aria-pressed', +b.dataset.l === n));
-  $('tgt').textContent = n.toFixed(3); renderStats(); if (!silent) { hop(); audio(); SFX.click(); musicSync(); }
+  $('tgt').textContent = n.toFixed(2); renderStats(); if (!silent) { hop(); audio(); SFX.click(); musicSync(); }
 }
 function toMenu() { if (state !== 'results' || performance.now() < lockUntil) return; setState('menu'); setMood('idle'); say('Ready? جاهز؟'); renderStats(); }
 function start() {
@@ -168,15 +168,15 @@ function stop(stamp) {
   const isBest = store.best[level] == null || diffMs < store.best[level]; if (isBest) store.best[level] = diffMs;
   save();
   $('rGrade').textContent = g.id; $('rGrade').className = 'grade g-' + g.id;
-  $('rTarget').textContent = level.toFixed(3) + 's';
+  $('rTarget').textContent = level.toFixed(2) + 's';
   $('rDir').textContent = diffMs === 0 ? 'EXACT' : actual < level ? 'EARLY BY' : 'LATE BY';
   $('rDiff').textContent = diffMs + ' ms'; $('rPts').textContent = '+' + pts; $('rNew').textContent = isBest ? '★ NEW BEST' : '';
   // count-up reveal from 0.00 to the stopped time
-  setMood('anticip'); say('…'); $('rActual').textContent = '0.000';
+  setMood('anticip'); say('…'); $('rActual').textContent = '0.00';
   const dur = Math.min(2800, Math.max(1500, actual * 260)), s0 = performance.now(); let lastK = 0;
   const done = () => {
     if (!rev) return; cancelAnimationFrame(rev.id); rev = null;
-    $('rActual').textContent = actual.toFixed(3); setState('results'); lockUntil = performance.now() + LOCK_MS;
+    $('rActual').textContent = actual.toFixed(2); setState('results'); lockUntil = performance.now() + LOCK_MS;
     const sad = g.pose === 'sad' ? sadFor(diffMs) : null;
     setMood(g.pose, sad); say(g.msg[Math.floor(Math.random() * g.msg.length)]); SFX[g.pose](sad);
     if (g.id === 'PERFECT') burst(170); else if (g.id === 'AMAZING') burst(60); else if (g.id === 'GREAT') burst(18);
@@ -185,7 +185,7 @@ function stop(stamp) {
   rev = { id: 0, done };
   const step = n => {
     const p = Math.min(1, (n - s0) / dur), v = actual * (1 - Math.pow(1 - p, 2.6));
-    $('rActual').textContent = v.toFixed(3);
+    $('rActual').textContent = v.toFixed(2);
     const k = Math.floor(v * 10); if (k !== lastK) { lastK = k; tone(300 + p * 800, 0.04, 'square', 0, 0.04); }
     if (p < 1) rev.id = requestAnimationFrame(step); else done();
   };
